@@ -3,7 +3,6 @@ package com.habanero.lifecycle
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.util.Log
 import androidx.core.graphics.createBitmap
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -54,6 +53,12 @@ class MainViewModel: ViewModel() {
         _bitmap.value = createBitmap(1, 1)
     }
 
+    fun backToFreshPhoto(context: Context) {
+        val file = File(context.filesDir, "fresh-picture.png")
+        val bm = BitmapFactory.decodeStream(file.inputStream())
+        _bitmap.value = bm
+    }
+
 //    fun restore() {
 //        _bitmap.value = xbitmap.value.copy(Bitmap.Config.ARGB_8888, false)
 //        Log.d("restore Restore_DrawBoxes", "Restored bitmap hash: ${_xbitmap.hashCode()}")
@@ -76,9 +81,5 @@ class MainViewModel: ViewModel() {
 
     fun setThreshold(t: Float, context: Context) {
         _threshold.value = t
-
-        val file = File(context.filesDir, "fresh-picture.png")
-        val bm = BitmapFactory.decodeStream(file.inputStream())
-        _bitmap.value = bm
     }
 }

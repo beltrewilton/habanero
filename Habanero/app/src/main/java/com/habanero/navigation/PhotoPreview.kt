@@ -42,6 +42,9 @@ fun PhotoPreview(bitmap: Bitmap, viewModel: MainViewModel) {
                     value = threshold,
                     onValueChange = {
                         viewModel.setThreshold(it, context)
+                    },
+                    onValueChangeFinished = {
+                        viewModel.backToFreshPhoto(context)
                     }
                 )
                 Text(text = threshold.toString())
