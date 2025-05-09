@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -45,7 +46,7 @@ fun Layout(
     bottomBar: Boolean = false,
     bottomSheetContent: (@Composable ColumnScope.() -> Unit)? = null,
     bottomBarContent: (@Composable () -> Unit)? = null,
-    content: @Composable () -> Unit
+    content: @Composable (PaddingValues) -> Unit
 ) {
     val showSheet by viewModel.showSheet.collectAsState()
 
@@ -95,9 +96,9 @@ fun Layout(
                 }
             }
         },
-        content = { // padding ->
+        content = {  padding ->
 
-            content()
+            content(padding)
 
         }
     )

@@ -21,12 +21,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.habanero.core.YOLOHelper
+import androidx.navigation.NavHostController
+import com.habanero.core.ModelHelper
 import com.habanero.layout.Layout
 import com.habanero.lifecycle.MainViewModel
 
 @Composable
-fun PhotoPreview(bitmap: Bitmap, viewModel: MainViewModel) {
+fun PhotoPreview(
+    navController: NavHostController,
+    bitmap: Bitmap,
+    bitmapList: List<Bitmap>,
+    viewModel: MainViewModel
+) {
     val threshold by viewModel.threshold.collectAsState()
     val cropit by viewModel.cropit.collectAsState()
     val context = LocalContext.current
@@ -52,7 +58,16 @@ fun PhotoPreview(bitmap: Bitmap, viewModel: MainViewModel) {
                 Text(text = threshold.toString())
             }
         },
-        bottomBarContent = { BottomBarContent(bitmap, viewModel, threshold, cropit) }
+        bottomBarContent = {
+            BottomBarContent(
+                navController,
+                bitmap,
+                bitmapList,
+                viewModel,
+                threshold,
+                cropit
+            )
+        }
     ) {
         Image(
             bitmap = bitmap.asImageBitmap(),
@@ -90,7 +105,14 @@ fun PhotoPreview(bitmap: Bitmap, viewModel: MainViewModel) {
 }
 
 @Composable
-fun BottomBarContent(bitmap: Bitmap, viewModel: MainViewModel, threshold: Float, cropit: Boolean) {
+fun BottomBarContent(
+    navController: NavHostController,
+    bitmap: Bitmap,
+    bitmapList: List<Bitmap>,
+    viewModel: MainViewModel,
+    threshold: Float,
+    cropit: Boolean
+) {
     val context = LocalContext.current
     Row(
         modifier = Modifier
@@ -99,7 +121,10 @@ fun BottomBarContent(bitmap: Bitmap, viewModel: MainViewModel, threshold: Float,
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         Button(
-            onClick = { viewModel.resetBitmap(bitmap) },
+            onClick = {
+                viewModel.resetBitmap(bitmap)
+                viewModel.clearBitmaps()
+            },
             shape = RoundedCornerShape(50),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00963D))
         ) {
@@ -109,7 +134,8 @@ fun BottomBarContent(bitmap: Bitmap, viewModel: MainViewModel, threshold: Float,
         if (cropit) {
             Button(
                 onClick = {
-                    YOLOHelper(viewModel).crop(context, threshold, bitmap)
+                    viewModel.clearBitmaps()
+                    ModelHelper(viewModel).crop(context, threshold, bitmap, bitmapList)
                     viewModel.setCropit(false)
                 },
                 shape = RoundedCornerShape(50),
@@ -119,7 +145,7 @@ fun BottomBarContent(bitmap: Bitmap, viewModel: MainViewModel, threshold: Float,
             }
         } else {
             Button(
-                onClick = { },
+                onClick = { navController.navigate(PhotoSlide) },
                 shape = RoundedCornerShape(50),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
             ) {

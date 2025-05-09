@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory
 import androidx.core.graphics.createBitmap
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.io.File
 import java.io.FileOutputStream
@@ -13,7 +14,7 @@ import java.io.FileOutputStream
 
 class MainViewModel: ViewModel() {
     private val _bitmap = MutableStateFlow ( value = createBitmap(1, 1) )
-    val bitmap = _bitmap.asStateFlow()
+    val bitmap: StateFlow<Bitmap> = _bitmap.asStateFlow()
 //    private val _xbitmap = MutableStateFlow ( value = createBitmap(1, 1) )
 //    val xbitmap = _xbitmap.asStateFlow()
 
@@ -60,6 +61,19 @@ class MainViewModel: ViewModel() {
         val bm = BitmapFactory.decodeStream(file.inputStream())
         _bitmap.value = bm
     }
+
+
+    private val _bitmapList = MutableStateFlow<List<Bitmap>>(emptyList())
+    val bitmapList: StateFlow<List<Bitmap>> = _bitmapList.asStateFlow()
+
+    fun addBitmap(bitmap: Bitmap) {
+        _bitmapList.value = _bitmapList.value + bitmap
+    }
+
+    fun clearBitmaps() {
+        _bitmapList.value = emptyList()
+    }
+
 
 //    fun restore() {
 //        _bitmap.value = xbitmap.value.copy(Bitmap.Config.ARGB_8888, false)

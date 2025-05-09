@@ -13,8 +13,8 @@ import com.habanero.layout.Layout
 import com.habanero.lifecycle.MainViewModel
 
 @Composable
-fun HomeScreen(navigateToSetting: () -> Unit) {
-    Layout("HABANERO DISEASE", viewModel = MainViewModel()) {
+fun HomeScreen(viewModel: MainViewModel, navigateToSetting: () -> Unit) {
+    Layout("HABANERO DISEASE", viewModel) {
 
         HabaneroBackground() {
             val context = LocalContext.current

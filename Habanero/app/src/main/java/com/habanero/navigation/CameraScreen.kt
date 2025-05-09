@@ -9,13 +9,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.habanero.lifecycle.MainViewModel
 
 @Composable
-fun CameraScreen() {
-    val viewModel = viewModel<MainViewModel>()
+fun CameraScreen(navController: NavHostController, viewModel: MainViewModel) {
     val current = LocalContext.current
     val bitmap by viewModel.bitmap.collectAsState()
+    val bitmapList by viewModel.bitmapList.collectAsState()
 
     val controller = remember {
         LifecycleCameraController(current).apply {
@@ -29,7 +30,7 @@ fun CameraScreen() {
     if (bitmap.width == 1 && bitmap.height == 1) {
         CameraPreview(controller = controller, viewModel = viewModel, current = current)
     } else {
-        PhotoPreview(bitmap, viewModel)
+        PhotoPreview(navController, bitmap, bitmapList, viewModel)
     }
 
 }

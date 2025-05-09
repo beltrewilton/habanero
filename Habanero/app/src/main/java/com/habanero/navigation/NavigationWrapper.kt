@@ -1,24 +1,32 @@
 package com.habanero.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.habanero.lifecycle.MainViewModel
 
 @Composable
 fun NavigationWrapper() {
     val navController = rememberNavController()
+    val viewModel = viewModel<MainViewModel>()
+
     NavHost(navController = navController, startDestination = Camera) {
         composable<Welcome> {
             WelcomeScreen(navController)
         }
 
         composable<Home> {
-            HomeScreen { navController.navigate(Setting) }
+            HomeScreen(viewModel) { navController.navigate(Setting) }
         }
 
         composable<Camera> {
-            CameraScreen()
+            CameraScreen(navController, viewModel)
+        }
+
+        composable<PhotoSlide> {
+            PhotoSlideScreen(navController, viewModel)
         }
 
         composable<Setting> {
