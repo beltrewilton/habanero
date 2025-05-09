@@ -47,6 +47,8 @@ class MainViewModel: ViewModel() {
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
         outputStream.flush()
         outputStream.close()
+
+        setCropit(true)
     }
 
     fun resetBitmap(bitmap: Bitmap) {
@@ -81,5 +83,12 @@ class MainViewModel: ViewModel() {
 
     fun setThreshold(t: Float, context: Context) {
         _threshold.value = t
+    }
+
+    private val _cropit = MutableStateFlow (value = true)
+    val cropit = _cropit.asStateFlow()
+
+    fun setCropit(b: Boolean) {
+        _cropit.value = b
     }
 }

@@ -28,6 +28,7 @@ import com.habanero.lifecycle.MainViewModel
 @Composable
 fun PhotoPreview(bitmap: Bitmap, viewModel: MainViewModel) {
     val threshold by viewModel.threshold.collectAsState()
+    val cropit by viewModel.cropit.collectAsState()
     val context = LocalContext.current
 
     Layout(
@@ -45,12 +46,13 @@ fun PhotoPreview(bitmap: Bitmap, viewModel: MainViewModel) {
                     },
                     onValueChangeFinished = {
                         viewModel.backToFreshPhoto(context)
+                        viewModel.setCropit(true)
                     }
                 )
                 Text(text = threshold.toString())
             }
         },
-        bottomBarContent = { BottomBarContent(bitmap, viewModel, threshold) }
+        bottomBarContent = { BottomBarContent(bitmap, viewModel, threshold, cropit) }
     ) {
         Image(
             bitmap = bitmap.asImageBitmap(),
@@ -60,35 +62,35 @@ fun PhotoPreview(bitmap: Bitmap, viewModel: MainViewModel) {
     }
 
 
-/**    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp)
+    /**    Box(
+    modifier = Modifier
+    .fillMaxSize()
+    .padding(20.dp)
     ) {
-        Text(
-            text = "PhotoPreview",
-            fontSize = 30.sp,
-            color = Color(0xFF225B22),
-            modifier = Modifier.padding(vertical = 20.dp)
-        )
-        val shape = listOf(bitmap.width,  bitmap.height).joinToString(", ")
-        Log.d("BITMAP", "PhotoPreview shape -> $shape")
+    Text(
+    text = "PhotoPreview",
+    fontSize = 30.sp,
+    color = Color(0xFF225B22),
+    modifier = Modifier.padding(vertical = 20.dp)
+    )
+    val shape = listOf(bitmap.width,  bitmap.height).joinToString(", ")
+    Log.d("BITMAP", "PhotoPreview shape -> $shape")
 
-        Image(
-            bitmap = bitmap.asImageBitmap(),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize()
-        )
+    Image(
+    bitmap = bitmap.asImageBitmap(),
+    contentDescription = null,
+    modifier = Modifier.fillMaxSize()
+    )
 
-        Button(onClick = {
-            viewModel.resetBitmap(bitmap)
-        }) { Text( text = "Re-take photo") }
+    Button(onClick = {
+    viewModel.resetBitmap(bitmap)
+    }) { Text( text = "Re-take photo") }
     }
-*/
+     */
 }
 
 @Composable
-fun BottomBarContent(bitmap: Bitmap, viewModel: MainViewModel, threshold: Float) {
+fun BottomBarContent(bitmap: Bitmap, viewModel: MainViewModel, threshold: Float, cropit: Boolean) {
     val context = LocalContext.current
     Row(
         modifier = Modifier
@@ -104,14 +106,25 @@ fun BottomBarContent(bitmap: Bitmap, viewModel: MainViewModel, threshold: Float)
             Text("Retake", color = Color.White)
         }
 
-        Button(
-            onClick = {
-//                viewModel.restore()
-                YOLOHelper(viewModel).crop(context, threshold, bitmap) },
-            shape = RoundedCornerShape(50),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
-        ) {
-            Text("Continue", color = Color.Black)
+        if (cropit) {
+            Button(
+                onClick = {
+                    YOLOHelper(viewModel).crop(context, threshold, bitmap)
+                    viewModel.setCropit(false)
+                },
+                shape = RoundedCornerShape(50),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
+            ) {
+                Text("Crop it", color = Color.Black)
+            }
+        } else {
+            Button(
+                onClick = { },
+                shape = RoundedCornerShape(50),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
+            ) {
+                Text("Continue", color = Color.Black)
+            }
         }
     }
 }
