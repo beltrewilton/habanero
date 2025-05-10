@@ -25,12 +25,13 @@ import androidx.navigation.NavHostController
 import com.habanero.core.ModelHelper
 import com.habanero.layout.Layout
 import com.habanero.lifecycle.MainViewModel
+import com.habanero.lifecycle.PhotoCar
 
 @Composable
 fun PhotoPreview(
     navController: NavHostController,
     bitmap: Bitmap,
-    bitmapList: List<Bitmap>,
+    photoCarList: List<PhotoCar>,
     viewModel: MainViewModel
 ) {
     val threshold by viewModel.threshold.collectAsState()
@@ -62,7 +63,6 @@ fun PhotoPreview(
             BottomBarContent(
                 navController,
                 bitmap,
-                bitmapList,
                 viewModel,
                 threshold,
                 cropit
@@ -108,7 +108,6 @@ fun PhotoPreview(
 fun BottomBarContent(
     navController: NavHostController,
     bitmap: Bitmap,
-    bitmapList: List<Bitmap>,
     viewModel: MainViewModel,
     threshold: Float,
     cropit: Boolean
@@ -135,7 +134,7 @@ fun BottomBarContent(
             Button(
                 onClick = {
                     viewModel.clearBitmaps()
-                    ModelHelper(viewModel).crop(context, threshold, bitmap, bitmapList)
+                    ModelHelper(viewModel).crop(context, threshold, bitmap)
                     viewModel.setCropit(false)
                 },
                 shape = RoundedCornerShape(50),

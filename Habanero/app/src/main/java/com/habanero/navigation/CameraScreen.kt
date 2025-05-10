@@ -8,7 +8,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.habanero.lifecycle.MainViewModel
 
@@ -16,7 +15,7 @@ import com.habanero.lifecycle.MainViewModel
 fun CameraScreen(navController: NavHostController, viewModel: MainViewModel) {
     val current = LocalContext.current
     val bitmap by viewModel.bitmap.collectAsState()
-    val bitmapList by viewModel.bitmapList.collectAsState()
+    val photoCarList by viewModel.photoCarList.collectAsState()
 
     val controller = remember {
         LifecycleCameraController(current).apply {
@@ -30,7 +29,7 @@ fun CameraScreen(navController: NavHostController, viewModel: MainViewModel) {
     if (bitmap.width == 1 && bitmap.height == 1) {
         CameraPreview(controller = controller, viewModel = viewModel, current = current)
     } else {
-        PhotoPreview(navController, bitmap, bitmapList, viewModel)
+        PhotoPreview(navController, bitmap, photoCarList, viewModel)
     }
 
 }

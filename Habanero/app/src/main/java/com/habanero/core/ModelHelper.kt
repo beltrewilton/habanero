@@ -7,7 +7,9 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
 import android.util.Log
+import androidx.compose.runtime.collectAsState
 import com.habanero.lifecycle.MainViewModel
+import com.habanero.lifecycle.PhotoCar
 import org.tensorflow.lite.Interpreter
 import java.io.File
 import java.io.FileInputStream
@@ -21,7 +23,7 @@ import kotlin.math.roundToInt
 class ModelHelper(private val viewModel: MainViewModel) {
 
     //    @Composable
-    fun crop(context: Context, threshold: Float, bitmap: Bitmap, bitmapList: List<Bitmap>) {
+    fun crop(context: Context, threshold: Float, bitmap: Bitmap) {
 //        var imageBitmaps by remember { mutableStateOf(listOf<Bitmap>()) }
 //        viewModel.restore()
 //        viewModel.resetBitmap(bitmap)
@@ -42,7 +44,7 @@ class ModelHelper(private val viewModel: MainViewModel) {
                 var y1 = (out[1] * bitmap.height).roundToInt()
                 var x2 = (out[2] * bitmap.width).roundToInt()
                 var y2 = (out[3] * bitmap.height).roundToInt()
-                val score = "%.2f".format(out[4])
+                val score = out[4]
 
                 x1 = minOf(maxOf(0, x1), bitmap.width)
                 y1 = minOf(maxOf(0, y1), bitmap.height)
@@ -52,7 +54,7 @@ class ModelHelper(private val viewModel: MainViewModel) {
 
                 val cropped = Bitmap.createBitmap(bitmap, x1, y1, x2 - x1, y2 - y1)
 
-                viewModel.addBitmap(cropped)
+                viewModel.addPhotoCar(bitmap = cropped)
 
                 val file = File(context.filesDir, "$i-cropped.png")
                 val outputStream = FileOutputStream(file)
@@ -70,18 +72,18 @@ class ModelHelper(private val viewModel: MainViewModel) {
         viewModel.onBoxedPhoto(boxedBitmap)
     }
 
-    fun inference(context: Context, bitmapList: List<Bitmap>) {
-        val modelName = "vgg16_model_2.tflite"
-//        val modelName = "mnet_model_2s.tflite"
-        val interpreter = getInterpreter(context, "models/$modelName")
+    fun inference(selectedModel: String,  context: Context, photoCarList: List<PhotoCar>) {
+        val interpreter = getInterpreter(context, "models/$selectedModel")
 
-        for ((index, bitmap) in bitmapList.withIndex()) {
-            val resized = Bitmap.createScaledBitmap(bitmap, 256, 256, true)
+        for ((index, photoCar) in photoCarList.withIndex()) {
+            val resized = Bitmap.createScaledBitmap(photoCar.bitmap, 256, 256, true)
             val input = convertBitmapToByteBuffer(resized, 256)
             val output = Array(1) { FloatArray(1) }
             interpreter.run(input, output)
             val pick = output[0].joinToString(", ") { String.format("%.4f", it) }
             Log.d("MODEL RESULT $index", "$index: $pick")
+
+            viewModel.updatePhotoCarScore(index, output[0][0])
         }
     }
 

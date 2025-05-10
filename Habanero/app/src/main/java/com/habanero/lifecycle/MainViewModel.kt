@@ -63,17 +63,41 @@ class MainViewModel: ViewModel() {
     }
 
 
-    private val _bitmapList = MutableStateFlow<List<Bitmap>>(emptyList())
-    val bitmapList: StateFlow<List<Bitmap>> = _bitmapList.asStateFlow()
+    private val _photoCarList = MutableStateFlow<List<PhotoCar>>(emptyList())
+    val photoCarList: StateFlow<List<PhotoCar>> = _photoCarList.asStateFlow()
 
-    fun addBitmap(bitmap: Bitmap) {
-        _bitmapList.value = _bitmapList.value + bitmap
+    fun addPhotoCar(bitmap: Bitmap, score: Float = 0.0f) {
+        val updated = _photoCarList.value + PhotoCar(bitmap, score)
+        _photoCarList.value = updated
     }
 
     fun clearBitmaps() {
-        _bitmapList.value = emptyList()
+        _photoCarList.value = emptyList()
     }
 
+    fun updatePhotoCarScore(index: Int, newScore: Float) {
+        val currentList = _photoCarList.value.toMutableList()
+        val photoCar = currentList.getOrNull(index) ?: return
+        currentList[index] = photoCar.copy(score = newScore)
+        _photoCarList.value = currentList
+    }
+
+
+    private val _models = MutableStateFlow<List<String>>(listOf("vgg16_model_2.tflite", "mnet_model_2s.tflite"))
+    val models: StateFlow<List<String>> = _models.asStateFlow()
+
+    private val _selectedIndex = MutableStateFlow<Int>(0)
+    val selectedIndex: StateFlow<Int> = _selectedIndex.asStateFlow()
+
+    private val _selectedModel = MutableStateFlow<String>(_models.value.get(_selectedIndex.value))
+    val selectedModel: StateFlow<String> = _selectedModel.asStateFlow()
+
+    fun setModelByIndex(index: Int) {
+        val selected = _models.value.get(index)
+        _selectedModel.value = selected
+
+        _selectedIndex.value = index
+    }
 
 //    fun restore() {
 //        _bitmap.value = xbitmap.value.copy(Bitmap.Config.ARGB_8888, false)
@@ -106,3 +130,8 @@ class MainViewModel: ViewModel() {
         _cropit.value = b
     }
 }
+
+data class PhotoCar (
+    val bitmap: Bitmap,
+    val score: Float = 0.0f
+)
