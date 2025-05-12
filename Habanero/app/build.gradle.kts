@@ -9,6 +9,13 @@ android {
     namespace = "com.habanero"
     compileSdk = 35
 
+    applicationVariants.all {
+        outputs.all {
+            var outputImpl = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+            outputImpl.outputFileName = "Habanero.apk"
+        }
+    }
+
     defaultConfig {
         applicationId = "com.habanero"
         minSdk = 24
