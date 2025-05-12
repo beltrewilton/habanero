@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.habanero.layout.Layout
 import com.habanero.lifecycle.MainViewModel
 
 
@@ -42,51 +43,68 @@ fun CameraPreview(
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(30.dp)
-    ) {
-        AndroidView(
-            factory = {
-                PreviewView(it).apply {
-                    this.controller = controller
-                    controller.bindToLifecycle(lifecycleOwner)
-                }
-            },
-            modifier = Modifier.fillMaxSize()
-                .padding(30.dp)
-        )
+    Layout(
+        viewModel = MainViewModel(),
+        bottomBar = false,
+        bottomBarContent = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(0.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.BottomCenter)
-                .padding(80.dp),
-            horizontalArrangement = Arrangement.Center
+            }
+        },
+//        backgroundImage = backgroundImage,
+        backgroundColor = Color(0xFFE8E854)
+    ) { padding ->
+
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
+            AndroidView(
+                factory = {
+                    PreviewView(it).apply {
+                        this.controller = controller
+                        controller.bindToLifecycle(lifecycleOwner)
+                    }
+                },
+                modifier = Modifier.fillMaxSize()
+//                    .padding(30.dp)
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .padding(80.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
 //            val imageName by remember { mutableStateOf("leaves.png") }
 //            val bitmap = remember(imageName) {
 //                BitmapFactory.decodeStream(current.assets.open(imageName))
 //            }
 
-            IconButton(
-                onClick = {
-                    takePhoto(
-                        controller = controller,
-                        current = current,
-                        onPhotoTaken = viewModel::onTakePhoto
+                IconButton(
+                    onClick = {
+                        takePhoto(
+                            controller = controller,
+                            current = current,
+                            onPhotoTaken = viewModel::onTakePhoto
+                        )
+                    },
+                    modifier = Modifier
+                        .size(72.dp)
+                        .background(Color.White, shape = CircleShape)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.PhotoCamera,
+                        contentDescription = "Take the photo",
+                        modifier = Modifier.size(32.dp)
                     )
-                },
-                modifier = Modifier
-                    .size(72.dp)
-                    .background(Color.White, shape = CircleShape)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.PhotoCamera,
-                    contentDescription = "Take the photo",
-                    modifier = Modifier.size(32.dp)
-                )
+                }
+
             }
         }
     }

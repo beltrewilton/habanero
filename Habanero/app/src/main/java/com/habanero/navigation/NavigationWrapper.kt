@@ -12,13 +12,13 @@ fun NavigationWrapper() {
     val navController = rememberNavController()
     val viewModel = viewModel<MainViewModel>()
 
-    NavHost(navController = navController, startDestination = Camera) {
+    NavHost(navController = navController, startDestination = Welcome) {
         composable<Welcome> {
             WelcomeScreen(navController)
         }
 
         composable<Home> {
-            HomeScreen(viewModel) { navController.navigate(Setting) }
+            HomeScreen(viewModel) { navController.navigate(Camera) }
         }
 
         composable<Camera> {

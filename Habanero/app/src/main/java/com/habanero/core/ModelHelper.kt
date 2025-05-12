@@ -139,7 +139,7 @@ class ModelHelper(private val viewModel: MainViewModel) {
         val canvas = Canvas(mutableBitmap)
 
         val paint = Paint().apply {
-            color = Color.BLUE
+            color = Color.RED
             style = Paint.Style.STROKE
             strokeWidth = 4f
         }
