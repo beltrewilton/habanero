@@ -1,6 +1,5 @@
 package com.habanero.navigation
 
-import android.util.Log
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.runtime.Composable
@@ -24,7 +23,6 @@ fun CameraScreen(navController: NavHostController, viewModel: MainViewModel) {
     }
 
     val shape = listOf(bitmap.width, bitmap.height).joinToString(", ")
-    Log.d("BITMAP", "CameraScreen shape -> $shape")
 
     if (bitmap.width == 1 && bitmap.height == 1) {
         CameraPreview(controller = controller, viewModel = viewModel, current = current)

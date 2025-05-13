@@ -13,6 +13,3 @@ object Camera
 
 @Serializable
 object PhotoSlide
-
-@Serializable
-object Setting

@@ -6,8 +6,6 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
-import android.util.Log
-import androidx.compose.runtime.collectAsState
 import com.habanero.lifecycle.MainViewModel
 import com.habanero.lifecycle.PhotoCar
 import org.tensorflow.lite.Interpreter
@@ -22,11 +20,7 @@ import kotlin.math.roundToInt
 
 class ModelHelper(private val viewModel: MainViewModel) {
 
-    //    @Composable
     fun crop(context: Context, threshold: Float, bitmap: Bitmap) {
-//        var imageBitmaps by remember { mutableStateOf(listOf<Bitmap>()) }
-//        viewModel.restore()
-//        viewModel.resetBitmap(bitmap)
         val resized = Bitmap.createScaledBitmap(bitmap, 640, 640, true) // BitMap!
         val input = convertBitmapToByteBuffer(resized, 640)
 
@@ -36,7 +30,6 @@ class ModelHelper(private val viewModel: MainViewModel) {
         interpreter.run(input, output)
 
         val boxes = mutableListOf<Rect>()
-
 
         for ((i, out) in output[0].withIndex()) {
             if (out[4] >= threshold) {
@@ -72,7 +65,7 @@ class ModelHelper(private val viewModel: MainViewModel) {
         viewModel.onBoxedPhoto(boxedBitmap)
     }
 
-    fun inference(selectedModel: String,  context: Context, photoCarList: List<PhotoCar>) {
+    fun inference(selectedModel: String, context: Context, photoCarList: List<PhotoCar>) {
         val interpreter = getInterpreter(context, "models/$selectedModel")
 
         for ((index, photoCar) in photoCarList.withIndex()) {
@@ -81,7 +74,6 @@ class ModelHelper(private val viewModel: MainViewModel) {
             val output = Array(1) { FloatArray(1) }
             interpreter.run(input, output)
             val pick = output[0].joinToString(", ") { String.format("%.4f", it) }
-            Log.d("MODEL RESULT $index", "$index: $pick")
 
             viewModel.updatePhotoCarScore(index, output[0][0])
         }
@@ -95,15 +87,6 @@ class ModelHelper(private val viewModel: MainViewModel) {
         val inputType = interpreter.getInputTensor(0).dataType()
         val outputShape = interpreter.getOutputTensor(0).shape()
         val outputType = interpreter.getOutputTensor(0).dataType()
-
-        Log.d(
-            path,
-            "Inputs: $inputCount, shape: ${inputShape.contentToString()}, type: $inputType"
-        )
-        Log.d(
-            path,
-            "Outputs: $outputCount, shape: ${outputShape.contentToString()}, type: $outputType"
-        )
 
         return interpreter
     }
@@ -144,7 +127,9 @@ class ModelHelper(private val viewModel: MainViewModel) {
             strokeWidth = 4f
         }
 
-        for (box in boxes) { canvas.drawRect(box, paint) }
+        for (box in boxes) {
+            canvas.drawRect(box, paint)
+        }
 
         return mutableBitmap
     }

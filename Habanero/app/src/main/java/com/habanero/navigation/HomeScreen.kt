@@ -1,6 +1,5 @@
 package com.habanero.navigation
 
-import android.content.Context
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -21,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.habanero.layout.Layout
@@ -30,18 +28,12 @@ import com.habanero.lifecycle.MainViewModel
 @Composable
 fun HomeScreen(viewModel: MainViewModel, navigateToCamera: () -> Unit) {
     val context = LocalContext.current
-    val backgroundImage = remember {
-        BitmapPainter(
-            BitmapFactory.decodeStream(context.assets.open("background.png")).asImageBitmap()
-        )
-    }
 
     Layout(
-        title = "HABANERO DISEASE",
+        title = "Plant disease dectection using CNN",
+        subtitle = "Capstone proyect SMU university\ncestevez@smu.edu",
         viewModel = viewModel,
         bottomBar = true,
-//        backgroundImage = backgroundImage,
-//        backgroundColor = Color.Yellow,
         bottomBarContent = {
             Row(
                 modifier = Modifier
@@ -61,9 +53,6 @@ fun HomeScreen(viewModel: MainViewModel, navigateToCamera: () -> Unit) {
                 }
             }
         }) { padding ->
-//        HabaneroBackground() {
-//
-//        }
         val context = LocalContext.current
         val leaf = remember() {
             BitmapFactory.decodeStream(context.assets.open("leaf.png"))

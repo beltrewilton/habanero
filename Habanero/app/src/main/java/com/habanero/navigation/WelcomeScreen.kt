@@ -16,14 +16,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.habanero.layout.Layout
 import com.habanero.lifecycle.MainViewModel
@@ -33,20 +30,15 @@ import kotlinx.coroutines.delay
 fun WelcomeScreen(navController: NavHostController) {
 
     LaunchedEffect(key1 = true) {
-        delay(2000)
+        delay(1000)
         navController.popBackStack()
         navController.navigate(Home)
     }
 
     val context = LocalContext.current
-    val backgroundImage = remember {
-        BitmapPainter(
-            BitmapFactory.decodeStream(context.assets.open("background.png")).asImageBitmap()
-        )
-    }
 
     Layout(
-        title = "",
+        title = null,
         viewModel = MainViewModel(),
         bottomBar = true,
         bottomBarContent = {
@@ -59,8 +51,6 @@ fun WelcomeScreen(navController: NavHostController) {
 
             }
         }
-//        backgroundImage = backgroundImage,
-//        backgroundColor = Color(0xFF5C8518)
     ) { padding ->
         val leaf = remember() {
             BitmapFactory.decodeStream(context.assets.open("leaf.png"))

@@ -12,35 +12,15 @@ import java.io.File
 import java.io.FileOutputStream
 
 
-class MainViewModel: ViewModel() {
-    private val _bitmap = MutableStateFlow ( value = createBitmap(1, 1) )
+class MainViewModel : ViewModel() {
+    private val _bitmap = MutableStateFlow(value = createBitmap(1, 1))
     val bitmap: StateFlow<Bitmap> = _bitmap.asStateFlow()
-//    private val _xbitmap = MutableStateFlow ( value = createBitmap(1, 1) )
-//    val xbitmap = _xbitmap.asStateFlow()
 
     fun onBoxedPhoto(bitmap: Bitmap) {
-//        val shape = listOf(bitmap.width,  bitmap.height).joinToString(", ")
-//        Log.d("BITMAP", "MainViewModel shape -> $shape")
         _bitmap.value = bitmap
-//        println("_bitmap hash: ${System.identityHashCode(_bitmap.value)}")
     }
 
     fun onTakePhoto(bitmap: Bitmap, context: Context) {
-//        val shape = listOf(bitmap.width,  bitmap.height).joinToString(", ")
-//        Log.d("BITMAP", "MainViewModel shape -> $shape")
-
-//        val immutableCopy = bitmap.copy(bitmap.config!!,  false)
-
-//        _xbitmap.value =  bitmap.copy(Bitmap.Config.ARGB_8888, false)
-
-//        val immutableBackup = bitmap.copy(Bitmap.Config.ARGB_8888, false)
-//        val mutableForEdit = immutableBackup.copy(Bitmap.Config.ARGB_8888, true)
-//
-//        _xbitmap.value = immutableBackup
-//        _bitmap.value = mutableForEdit
-
-//        Log.d("backup Restore_DrawBoxes", "Restored bitmap hash: ${xbitmap.hashCode()}")
-
         _bitmap.value = bitmap
 
         val file = File(context.filesDir, "fresh-picture.png")
@@ -83,7 +63,8 @@ class MainViewModel: ViewModel() {
     }
 
 
-    private val _models = MutableStateFlow<List<String>>(listOf("vgg16_model_2.tflite", "mnet_model_2s.tflite"))
+    private val _models =
+        MutableStateFlow<List<String>>(listOf("vgg16_model_2.tflite", "mnet_model_2s.tflite"))
     val models: StateFlow<List<String>> = _models.asStateFlow()
 
     private val _selectedIndex = MutableStateFlow<Int>(0)
@@ -99,31 +80,21 @@ class MainViewModel: ViewModel() {
         _selectedIndex.value = index
     }
 
-//    fun restore() {
-//        _bitmap.value = xbitmap.value.copy(Bitmap.Config.ARGB_8888, false)
-//        Log.d("restore Restore_DrawBoxes", "Restored bitmap hash: ${_xbitmap.hashCode()}")
-//    }
-
-
-//    fun resetxBitmap() {
-//        _xbitmap.value = createBitmap(1, 1)
-//    }
-
-    private val _showSheet = MutableStateFlow (value = false)
+    private val _showSheet = MutableStateFlow(value = false)
     val showSheet = _showSheet.asStateFlow()
 
     fun setShowSheet(b: Boolean) {
         _showSheet.value = b
     }
 
-    private val _threshold = MutableStateFlow (0.6f)
+    private val _threshold = MutableStateFlow(0.6f)
     val threshold = _threshold.asStateFlow()
 
-    fun setThreshold(t: Float, context: Context) {
+    fun setThreshold(t: Float) {
         _threshold.value = t
     }
 
-    private val _cropit = MutableStateFlow (value = true)
+    private val _cropit = MutableStateFlow(value = true)
     val cropit = _cropit.asStateFlow()
 
     fun setCropit(b: Boolean) {
@@ -131,7 +102,7 @@ class MainViewModel: ViewModel() {
     }
 }
 
-data class PhotoCar (
+data class PhotoCar(
     val bitmap: Bitmap,
     val score: Float = 0.0f
 )

@@ -28,9 +28,5 @@ fun NavigationWrapper() {
         composable<PhotoSlide> {
             PhotoSlideScreen(navController, viewModel)
         }
-
-        composable<Setting> {
-            SettingScreen()
-        }
     }
 }

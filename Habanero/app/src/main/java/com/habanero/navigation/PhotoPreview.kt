@@ -62,7 +62,7 @@ fun PhotoPreview(
                 Slider(
                     value = threshold,
                     onValueChange = {
-                        viewModel.setThreshold(it, context)
+                        viewModel.setThreshold(it)
                     },
                     onValueChangeFinished = {
                         viewModel.backToFreshPhoto(context)
@@ -95,33 +95,6 @@ fun PhotoPreview(
             )
         }
     }
-
-
-    /**    Box(
-    modifier = Modifier
-    .fillMaxSize()
-    .padding(20.dp)
-    ) {
-    Text(
-    text = "PhotoPreview",
-    fontSize = 30.sp,
-    color = Color(0xFF225B22),
-    modifier = Modifier.padding(vertical = 20.dp)
-    )
-    val shape = listOf(bitmap.width,  bitmap.height).joinToString(", ")
-    Log.d("BITMAP", "PhotoPreview shape -> $shape")
-
-    Image(
-    bitmap = bitmap.asImageBitmap(),
-    contentDescription = null,
-    modifier = Modifier.fillMaxSize()
-    )
-
-    Button(onClick = {
-    viewModel.resetBitmap(bitmap)
-    }) { Text( text = "Re-take photo") }
-    }
-     */
 }
 
 @Composable

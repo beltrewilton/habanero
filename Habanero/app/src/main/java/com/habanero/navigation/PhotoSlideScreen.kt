@@ -7,10 +7,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -19,9 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Bolt
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Sick
-import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -35,9 +31,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,11 +39,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -66,8 +55,11 @@ fun PhotoSlideScreen(navController: NavHostController, viewModel: MainViewModel)
     val selectedModel = viewModel.selectedModel.collectAsState().value
     var selectedIndex = viewModel.selectedIndex.collectAsState().value
     val screenWidthDp = LocalConfiguration.current.screenWidthDp
+    val screenHeightDp = LocalConfiguration.current.screenHeightDp
 
     Layout(
+        title = "Performing inference with model\n$selectedModel",
+        titleColor = Color.Black,
         viewModel = viewModel,
         backgroundColor = Color(0xFFE5DE26),
         bottomBar = true,
@@ -105,137 +97,100 @@ fun PhotoSlideScreen(navController: NavHostController, viewModel: MainViewModel)
             )
         }) { padding ->
         if (photoCarList.isNotEmpty()) {
-            Column(
-//                modifier = Modifier.fillMaxWidth(),
-//                horizontalAlignment = Alignment.CenterHorizontally
+            LazyRow(
+                modifier = Modifier.padding(top = padding.calculateTopPadding()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 35.dp),
-                    horizontalAlignment = Alignment.Start
-                )
-                {
-                    Text(
-                        text = buildAnnotatedString {
-                            append("Performing inference with model ")
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append(selectedModel)
-                            }
-                        },
-                        fontSize = 18.sp,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-
-                LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(620.dp)
-                        .padding(padding),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(photoCarList.size) { index ->
-                        Card(
-                            modifier = Modifier
-                                .width(screenWidthDp.dp)
-                                .fillMaxHeight(),
-                            shape = RoundedCornerShape(16.dp),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color.White)
-                        ) {
-                            Column(
-                                modifier = Modifier.fillMaxSize()
+                items(photoCarList.size) { index ->
+                    Card(
+                        modifier = Modifier
+                            .width(screenWidthDp.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White)
+                    ) {
+                        Column() {
+                            Box(
+                                modifier = Modifier
+                                    .size(screenWidthDp.dp)
+                                    .clip(RoundedCornerShape(8.dp))
                             ) {
-                                Box(
+                                Image(
+                                    bitmap = photoCarList[index].bitmap.asImageBitmap(),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
                                     modifier = Modifier
-                                        .size(screenWidthDp.dp)
+                                        .fillMaxSize()
+                                        .padding(10.dp)
                                         .clip(RoundedCornerShape(8.dp))
+                                )
+
+                                Text(
+                                    text = "${index + 1} of ${photoCarList.size}",
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 12.sp,
+                                    modifier = Modifier
+                                        .align(Alignment.TopStart)
+                                        .padding(start = 20.dp, top = 20.dp)
+                                        .background(
+                                            color = Color.Black.copy(alpha = 0.5f),
+                                            shape = RoundedCornerShape(6.dp)
+                                        )
+                                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                                )
+                            }
+
+                            if (photoCarList[index].score > 0) {
+                                Column(
+                                    horizontalAlignment = Alignment.End
                                 ) {
-                                    Image(
-                                        bitmap = photoCarList[index].bitmap.asImageBitmap(),
-                                        contentDescription = null,
-                                        contentScale = ContentScale.Crop,
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .padding(10.dp)
-                                            .clip(RoundedCornerShape(8.dp))
-                                    )
-
-                                    Text(
-                                        text = "${index + 1} of ${photoCarList.size}",
-                                        color = Color.White,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 12.sp,
-                                        modifier = Modifier
-                                            .align(Alignment.TopStart)
-                                            .padding(start = 20.dp, top = 20.dp)
-                                            .background(
-                                                color = Color.Black.copy(alpha = 0.5f),
-                                                shape = RoundedCornerShape(6.dp)
-                                            )
-                                            .padding(horizontal = 8.dp, vertical = 4.dp)
-                                    )
-                                }
-
-                                if (photoCarList[index].score > 0) {
-                                    Column(
-//                                        modifier = Modifier.fillMaxSize(),
-                                        horizontalAlignment = Alignment.End
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
+
                                         Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.SpaceBetween
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier.padding(start = 20.dp)
                                         ) {
+                                            Icon(
+                                                imageVector = if (photoCarList[index].score <= 0.5f)
+                                                    Icons.Filled.VerifiedUser
+                                                else
+                                                    Icons.Filled.Sick,
+                                                contentDescription = null,
+                                                tint = if (photoCarList[index].score <= 0.5f)
+                                                    Color(0xFF4CAF50)
+                                                else
+                                                    Color(0xFFF44336)
+                                            )
 
-                                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = 20.dp)) {
-                                                Icon(
-                                                    imageVector = if (photoCarList[index].score <= 0.5f)
-                                                        Icons.Filled.VerifiedUser
-                                                    else
-                                                        Icons.Filled.Sick,
-                                                    contentDescription = null,
-                                                    tint = if (photoCarList[index].score <= 0.5f)
-                                                        Color(0xFF4CAF50)
-                                                    else
-                                                        Color(0xFFF44336)
-                                                )
-
-                                                Spacer(modifier = Modifier.width(8.dp)) // spacing between icon and text
-
-                                                Text(
-                                                    text = if (photoCarList[index].score <= 0.5f) "Healthy" else "Disease",
-                                                    color = Color.Black,
-                                                    fontSize = 12.sp,
-                                                    fontWeight = FontWeight.Bold
-                                                )
-                                            }
+                                            Spacer(modifier = Modifier.width(8.dp)) // spacing between icon and text
 
                                             Text(
-                                                text = "Score: ${photoCarList[index].score}",
+                                                text = if (photoCarList[index].score <= 0.5f) "Healthy" else "Disease",
                                                 color = Color.Black,
-                                                fontWeight = FontWeight.Bold,
                                                 fontSize = 12.sp,
-                                                modifier = Modifier.padding(horizontal = 20.dp)
+                                                fontWeight = FontWeight.Bold
                                             )
                                         }
+
                                         Text(
-                                            text = "Class: photo.className",
-                                            color = Color.Black,
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 12.sp,
-                                            modifier = Modifier.padding(horizontal = 20.dp)
-                                        )
-                                        Text(
-                                            text = "Processed in photo.processTime ms",
+                                            text = "Score: %.4f".format(photoCarList[index].score),
                                             color = Color.Black,
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 12.sp,
                                             modifier = Modifier.padding(horizontal = 20.dp)
                                         )
                                     }
+                                    Text(
+                                        text = "Processed in photo.processTime ms",
+                                        color = Color.Black,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 12.sp,
+                                        modifier = Modifier.padding(horizontal = 20.dp)
+                                    )
                                 }
                             }
                         }

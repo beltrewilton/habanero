@@ -1,23 +1,21 @@
 package com.habanero.layout
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Button
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -25,7 +23,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -49,6 +46,8 @@ import kotlinx.coroutines.launch
 fun Layout(
     title: String? = null,
     titleColor: Color = Color.White,
+    subtitle: String? = null,
+    subtitleColor: Color = Color.White,
     viewModel: MainViewModel,
     bottomBar: Boolean = false,
     bottomSheetContent: (@Composable ColumnScope.() -> Unit)? = null,
@@ -61,7 +60,6 @@ fun Layout(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        // Background image if provided
         if (backgroundImage != null) {
             Image(
                 painter = backgroundImage,
@@ -71,7 +69,6 @@ fun Layout(
             )
         }
 
-        // Background color if provided and image is not used
         if (backgroundImage == null && backgroundColor != null) {
             Box(
                 modifier = Modifier
@@ -91,19 +88,31 @@ fun Layout(
         Scaffold(
             containerColor = Color.Transparent,
             topBar = {
-                if (title != null) {
-                    CenterAlignedTopAppBar(
-                        title = {
-                            Text(
-                                text = title,
-                                fontSize = 22.sp,
-                                color = titleColor
-                            )
-                        },
-                        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                            containerColor = Color.Transparent
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(140.dp)
+                        .background(Color.Transparent)
+                        .padding(top = 40.dp), // Top margin inside topBar
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    if (title != null) {
+                        Text(
+                            text = title.uppercase(),
+                            fontSize = 22.sp,
+                            color = titleColor,
+                            textAlign = TextAlign.Center
                         )
-                    )
+                        if (subtitle != null) {
+                            Text(
+                                text = subtitle,
+                                fontSize = 14.sp,
+                                color = subtitleColor,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
                 }
             },
             floatingActionButton = {

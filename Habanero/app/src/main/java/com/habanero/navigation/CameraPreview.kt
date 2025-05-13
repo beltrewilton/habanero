@@ -3,7 +3,6 @@ package com.habanero.navigation
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Matrix
-import android.util.Log
 import androidx.camera.core.ImageCapture.OnImageCapturedCallback
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
@@ -56,7 +55,6 @@ fun CameraPreview(
 
             }
         },
-//        backgroundImage = backgroundImage,
         backgroundColor = Color(0xFFE8E854)
     ) { padding ->
 
@@ -71,7 +69,6 @@ fun CameraPreview(
                     }
                 },
                 modifier = Modifier.fillMaxSize()
-//                    .padding(30.dp)
             )
 
             Row(
@@ -81,11 +78,6 @@ fun CameraPreview(
                     .padding(80.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
-//            val imageName by remember { mutableStateOf("leaves.png") }
-//            val bitmap = remember(imageName) {
-//                BitmapFactory.decodeStream(current.assets.open(imageName))
-//            }
-
                 IconButton(
                     onClick = {
                         takePhoto(
@@ -110,7 +102,6 @@ fun CameraPreview(
     }
 }
 
-
 private fun takePhoto(
     controller: LifecycleCameraController,
     current: Context,
@@ -121,7 +112,6 @@ private fun takePhoto(
         object : OnImageCapturedCallback() {
             override fun onCaptureStarted() {
                 super.onCaptureStarted()
-                Log.d("onCaptureStarted", "onCaptureStarted")
             }
 
             override fun onCaptureSuccess(image: ImageProxy) {
@@ -142,24 +132,20 @@ private fun takePhoto(
                 )
 
                 val shape = listOf(rotatedBitmap.width, rotatedBitmap.height).joinToString(", ")
-                Log.d("BITMAP", "fun takePhoto shape -> $shape")
                 onPhotoTaken(rotatedBitmap, current)
             }
 
             override fun onError(exception: ImageCaptureException) {
                 super.onError(exception)
-                Log.e("CAMERA", "Could't take the photo", exception)
             }
 
             override fun onCaptureProcessProgressed(progress: Int) {
                 super.onCaptureProcessProgressed(progress)
-                Log.d("onCaptureProcessProgressed", "onCaptureProcessProgressed: $progress")
             }
 
             override fun onPostviewBitmapAvailable(bitmap: Bitmap) {
                 super.onPostviewBitmapAvailable(bitmap)
                 val shape = listOf(bitmap.width, bitmap.height).joinToString(", ")
-                Log.d("onPostviewBitmapAvailable", "onPostviewBitmapAvailable shape -> $shape")
             }
         }
     )
