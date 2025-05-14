@@ -121,6 +121,13 @@ class MainViewModel : ViewModel() {
     fun setCropit(b: Boolean) {
         _cropit.value = b
     }
+
+    private val _hasboxes = MutableStateFlow(value = true)
+    val hasboxes = _hasboxes.asStateFlow()
+
+    fun setHasboxes(b: Boolean) {
+        _hasboxes.value = b
+    }
 }
 
 data class PhotoCar(

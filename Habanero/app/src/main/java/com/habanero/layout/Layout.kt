@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,8 +52,6 @@ import kotlinx.coroutines.launch
 fun Layout(
     title: String? = null,
     titleColor: Color = Color.White,
-    subtitle: String? = null,
-    subtitleColor: Color = Color.White,
     viewModel: MainViewModel,
     bottomBar: Boolean = false,
     bottomSheetContent: (@Composable ColumnScope.() -> Unit)? = null,
@@ -61,6 +60,9 @@ fun Layout(
     backgroundImage: Painter? = null,
     content: @Composable (PaddingValues) -> Unit
 ) {
+
+    val screenHeightDp = LocalConfiguration.current.screenHeightDp
+    val topBarHeight = screenHeightDp * 0.2
 
     val loading by viewModel.loading.collectAsState()
 
@@ -121,27 +123,20 @@ fun Layout(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(140.dp)
+                        .height(topBarHeight.dp)
                         .background(Color.Transparent)
                         .padding(top = 40.dp), // Top margin inside topBar
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
+
                 ) {
                     if (title != null) {
                         Text(
                             text = title.uppercase(),
-                            fontSize = 22.sp,
+                            fontSize = 21.sp,
                             color = titleColor,
                             textAlign = TextAlign.Center
                         )
-                        if (subtitle != null) {
-                            Text(
-                                text = subtitle,
-                                fontSize = 14.sp,
-                                color = subtitleColor,
-                                textAlign = TextAlign.Center
-                            )
-                        }
                     }
                 }
             },

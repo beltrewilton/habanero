@@ -69,6 +69,8 @@ class ModelHelper(private val viewModel: MainViewModel) {
             withContext(Dispatchers.Main) {
                 viewModel.onBoxedPhoto(boxedBitmap)
                 viewModel.setLoading(false)
+                viewModel.setCropit(false)
+                viewModel.setHasboxes(boxes.size > 0)
             }
         }
     }

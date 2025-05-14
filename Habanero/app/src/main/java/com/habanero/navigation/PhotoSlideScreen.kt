@@ -47,6 +47,7 @@ import com.habanero.core.ModelHelper
 import com.habanero.layout.Layout
 import com.habanero.lifecycle.MainViewModel
 import com.habanero.lifecycle.PhotoCar
+import com.habanero.ui.theme.darkred
 import com.habanero.ui.theme.green
 import com.habanero.ui.theme.yellow
 
@@ -168,7 +169,7 @@ fun PhotoSlideScreen(navController: NavHostController, viewModel: MainViewModel)
                                                     tint = if (photoCarList[index].score <= 0.5f)
                                                         green
                                                     else
-                                                        green
+                                                        darkred
                                                 )
 
                                                 Spacer(modifier = Modifier.width(8.dp)) // spacing between icon and text

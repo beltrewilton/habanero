@@ -16,15 +16,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Crop
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -50,6 +56,7 @@ fun PhotoPreview(
 ) {
     val threshold by viewModel.threshold.collectAsState()
     val cropit by viewModel.cropit.collectAsState()
+    val hasboxes by viewModel.hasboxes.collectAsState()
     val context = LocalContext.current
 
     Layout(
@@ -70,6 +77,7 @@ fun PhotoPreview(
                     onValueChangeFinished = {
                         viewModel.backToFreshPhoto(context)
                         viewModel.setCropit(true)
+                        viewModel.setHasboxes(true)
                     },
                     colors = SliderDefaults.colors(
                         activeTrackColor = darkgreen,
@@ -86,7 +94,8 @@ fun PhotoPreview(
                 bitmap,
                 viewModel,
                 threshold,
-                cropit
+                cropit,
+                hasboxes
             )
         }
     ) { padding ->
@@ -104,15 +113,18 @@ fun PhotoPreview(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomBarContent(
     navController: NavHostController,
     bitmap: Bitmap,
     viewModel: MainViewModel,
     threshold: Float,
-    cropit: Boolean
+    cropit: Boolean,
+    hasboxes: Boolean
 ) {
     val context = LocalContext.current
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -123,6 +135,7 @@ fun BottomBarContent(
             onClick = {
                 viewModel.resetBitmap(bitmap)
                 viewModel.clearBitmaps()
+                viewModel.setHasboxes(true)
             },
             shape = RoundedCornerShape(20),
             colors = ButtonDefaults.buttonColors(containerColor = darkgreen),
@@ -137,40 +150,78 @@ fun BottomBarContent(
             Text("Retake", color = Color.White)
         }
 
-        if (cropit) {
-            Button(
-                onClick = {
-                    viewModel.clearBitmaps()
-                    ModelHelper(viewModel).crop(context, threshold, bitmap)
-                    viewModel.setCropit(false)
-                },
-                shape = RoundedCornerShape(20),
-                colors = ButtonDefaults.buttonColors(containerColor = darkred),
-                modifier = Modifier.width(150.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Crop,
-                    contentDescription = "Crop",
-                    tint = Color.White
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Crop it", color = Color.White)
+        if (hasboxes) {
+            if (cropit) {
+                Button(
+                    onClick = {
+                        viewModel.clearBitmaps()
+                        ModelHelper(viewModel).crop(context, threshold, bitmap)
+                    },
+                    shape = RoundedCornerShape(20),
+                    colors = ButtonDefaults.buttonColors(containerColor = darkred),
+                    modifier = Modifier.width(150.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Crop,
+                        contentDescription = "Crop",
+                        tint = Color.White
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Crop it", color = Color.White)
+                }
+            } else {
+                Button(
+                    onClick = { navController.navigate(PhotoSlide) },
+                    shape = RoundedCornerShape(20),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                    modifier = Modifier.width(150.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "continue",
+                        tint = Color.White
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Continue", color = Color.White)
+                }
             }
         } else {
-            Button(
-                onClick = { navController.navigate(PhotoSlide) },
-                shape = RoundedCornerShape(20),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                modifier = Modifier.width(150.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = "continue",
-                    tint = Color.White
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Continue", color = Color.White)
+            val openAlertDialog = remember { mutableStateOf(true) }
+            if (openAlertDialog.value) {
+                HDialog(
+                    onDismissRequest = { openAlertDialog.value = false },
+                    onConfirmation = { openAlertDialog.value = false })
             }
         }
     }
+}
+
+@Composable
+fun HDialog(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit
+) {
+    AlertDialog(
+        icon = {
+            Icon(Icons.Default.Warning, contentDescription = null)
+        },
+        title = {
+            Text(text = "No leaft found!")
+        },
+        text = {
+            Text(text = "Please try again or adjust the threshold.")
+        },
+        onDismissRequest = {
+            onDismissRequest()
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirmation()
+                }
+            ) {
+                Text("Understood!")
+            }
+        }
+    )
 }

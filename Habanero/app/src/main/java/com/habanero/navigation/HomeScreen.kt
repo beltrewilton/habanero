@@ -21,7 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.habanero.layout.Layout
 import com.habanero.lifecycle.MainViewModel
 import com.habanero.ui.theme.homeSubtitle
@@ -33,7 +35,6 @@ fun HomeScreen(viewModel: MainViewModel, navigateToCamera: () -> Unit) {
 
     Layout(
         title = homeTitle,
-        subtitle = homeSubtitle,
         viewModel = viewModel,
         bottomBar = true,
         bottomBarContent = {
@@ -66,6 +67,17 @@ fun HomeScreen(viewModel: MainViewModel, navigateToCamera: () -> Unit) {
                 .padding(padding),
             contentAlignment = Alignment.Center
         ) {
+            Box ( modifier = Modifier
+                .fillMaxSize(),
+                contentAlignment = Alignment.TopCenter) {
+                Text(
+                    text = homeSubtitle,
+                    fontSize = 16.sp,
+                    color = Color.White,
+                    textAlign = TextAlign.Center
+                )
+            }
+
             Image(
                 bitmap = leaf,
                 contentDescription = null,
