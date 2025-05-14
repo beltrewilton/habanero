@@ -27,10 +27,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.habanero.layout.Layout
 import com.habanero.lifecycle.MainViewModel
+import java.util.concurrent.Executors
 
 
 @Composable
@@ -107,8 +107,9 @@ private fun takePhoto(
     current: Context,
     onPhotoTaken: (Bitmap, Context) -> Unit
 ) {
+    val cameraExecutor = Executors.newSingleThreadExecutor()
     controller.takePicture(
-        ContextCompat.getMainExecutor(current),
+        cameraExecutor,
         object : OnImageCapturedCallback() {
             override fun onCaptureStarted() {
                 super.onCaptureStarted()
