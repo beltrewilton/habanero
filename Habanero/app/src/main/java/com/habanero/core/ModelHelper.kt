@@ -8,6 +8,10 @@ import android.graphics.Paint
 import android.graphics.Rect
 import com.habanero.lifecycle.MainViewModel
 import com.habanero.lifecycle.PhotoCar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.tensorflow.lite.Interpreter
 import java.io.File
 import java.io.FileInputStream
@@ -21,61 +25,78 @@ import kotlin.math.roundToInt
 class ModelHelper(private val viewModel: MainViewModel) {
 
     fun crop(context: Context, threshold: Float, bitmap: Bitmap) {
-        val resized = Bitmap.createScaledBitmap(bitmap, 640, 640, true) // BitMap!
-        val input = convertBitmapToByteBuffer(resized, 640)
+        viewModel.setLoading(true)
 
-        val output = Array(1) { Array(300) { FloatArray(6) } }
+        CoroutineScope(Dispatchers.Default).launch {
+            val resized = Bitmap.createScaledBitmap(bitmap, 640, 640, true)
+            val input = convertBitmapToByteBuffer(resized, 640)
+            val output = Array(1) { Array(300) { FloatArray(6) } }
 
-        val interpreter = getInterpreter(context, "models/yolo11n_model_1_float16.tflite")
-        interpreter.run(input, output)
+            val interpreter = getInterpreter(context, "models/yolo11n_model_1_float16.tflite")
+            interpreter.run(input, output)
 
-        val boxes = mutableListOf<Rect>()
+            val boxes = mutableListOf<Rect>()
 
-        for ((i, out) in output[0].withIndex()) {
-            if (out[4] >= threshold) {
-                var x1 = (out[0] * bitmap.width).roundToInt()
-                var y1 = (out[1] * bitmap.height).roundToInt()
-                var x2 = (out[2] * bitmap.width).roundToInt()
-                var y2 = (out[3] * bitmap.height).roundToInt()
-                val score = out[4]
+            for ((i, out) in output[0].withIndex()) {
+                if (out[4] >= threshold) {
+                    var x1 = (out[0] * bitmap.width).roundToInt()
+                    var y1 = (out[1] * bitmap.height).roundToInt()
+                    var x2 = (out[2] * bitmap.width).roundToInt()
+                    var y2 = (out[3] * bitmap.height).roundToInt()
 
-                x1 = minOf(maxOf(0, x1), bitmap.width)
-                y1 = minOf(maxOf(0, y1), bitmap.height)
-                x2 = minOf(maxOf(0, x2), bitmap.width)
-                y2 = minOf(maxOf(0, y2), bitmap.height)
+                    x1 = minOf(maxOf(0, x1), bitmap.width)
+                    y1 = minOf(maxOf(0, y1), bitmap.height)
+                    x2 = minOf(maxOf(0, x2), bitmap.width)
+                    y2 = minOf(maxOf(0, y2), bitmap.height)
 
+                    val cropped = Bitmap.createBitmap(bitmap, x1, y1, x2 - x1, y2 - y1)
 
-                val cropped = Bitmap.createBitmap(bitmap, x1, y1, x2 - x1, y2 - y1)
+                    withContext(Dispatchers.Main) {
+                        viewModel.addPhotoCar(cropped)
+                    }
 
-                viewModel.addPhotoCar(bitmap = cropped)
+                    val file = File(context.filesDir, "$i-cropped.png")
+                    FileOutputStream(file).use {
+                        cropped.compress(Bitmap.CompressFormat.PNG, 100, it)
+                    }
 
-                val file = File(context.filesDir, "$i-cropped.png")
-                val outputStream = FileOutputStream(file)
-                cropped.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-                outputStream.flush()
-                outputStream.close()
+                    boxes.add(Rect(x1, y1, x2, y2))
+                }
+            }
 
-                println("Threshold: $threshold, Score: $score, Box($x1, $y1, $x2, $y2)")
+            val boxedBitmap = drawBoxes(bitmap, boxes)
 
-                boxes.add(Rect(x1, y1, x2, y2))
+            withContext(Dispatchers.Main) {
+                viewModel.onBoxedPhoto(boxedBitmap)
+                viewModel.setLoading(false)
             }
         }
-
-        val boxedBitmap = drawBoxes(bitmap, boxes)
-        viewModel.onBoxedPhoto(boxedBitmap)
     }
 
     fun inference(selectedModel: String, context: Context, photoCarList: List<PhotoCar>) {
-        val interpreter = getInterpreter(context, "models/$selectedModel")
+        viewModel.setLoading(true)
 
-        for ((index, photoCar) in photoCarList.withIndex()) {
-            val resized = Bitmap.createScaledBitmap(photoCar.bitmap, 256, 256, true)
-            val input = convertBitmapToByteBuffer(resized, 256)
-            val output = Array(1) { FloatArray(1) }
-            interpreter.run(input, output)
-            val pick = output[0].joinToString(", ") { String.format("%.4f", it) }
+        CoroutineScope(Dispatchers.Default).launch {
+            val interpreter = getInterpreter(context, "models/$selectedModel")
+            val totalProcessTime = mutableListOf<Long>()
 
-            viewModel.updatePhotoCarScore(index, output[0][0])
+            for ((index, photoCar) in photoCarList.withIndex()) {
+                val startTime = System.currentTimeMillis()
+                val resized = Bitmap.createScaledBitmap(photoCar.bitmap, 256, 256, true)
+                val input = convertBitmapToByteBuffer(resized, 256)
+                val output = Array(1) { FloatArray(1) }
+                interpreter.run(input, output)
+                val pick = output[0].joinToString(", ") { String.format("%.4f", it) }
+                val processTime = System.currentTimeMillis() - startTime
+                totalProcessTime.add(processTime)
+
+                viewModel.updatePhotoCarScore(index, output[0][0], processTime)
+            }
+
+            withContext(Dispatchers.Main) {
+                viewModel.setTotalProcessTime(totalProcessTime.sum())
+                viewModel.setLoading(false)
+            }
         }
     }
 

@@ -20,6 +20,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -67,7 +68,11 @@ fun PhotoPreview(
                     onValueChangeFinished = {
                         viewModel.backToFreshPhoto(context)
                         viewModel.setCropit(true)
-                    }
+                    },
+                    colors = SliderDefaults.colors(
+                        activeTrackColor = Color(0xFF5C8518),
+                        inactiveTrackColor = Color.LightGray
+                    )
                 )
                 Spacer(modifier = Modifier.height(14.dp))
                 Text(text = threshold.toString(), fontSize = 25.sp)

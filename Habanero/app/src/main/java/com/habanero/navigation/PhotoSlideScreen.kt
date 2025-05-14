@@ -54,6 +54,8 @@ fun PhotoSlideScreen(navController: NavHostController, viewModel: MainViewModel)
     val models = viewModel.models.collectAsState().value
     val selectedModel = viewModel.selectedModel.collectAsState().value
     var selectedIndex = viewModel.selectedIndex.collectAsState().value
+    var totalProcessTimeStr = viewModel.totalProcessTimeStr.collectAsState().value
+    var totalProcessTime = viewModel.totalProcessTime.collectAsState().value
     val screenWidthDp = LocalConfiguration.current.screenWidthDp
     val screenHeightDp = LocalConfiguration.current.screenHeightDp
 
@@ -97,109 +99,119 @@ fun PhotoSlideScreen(navController: NavHostController, viewModel: MainViewModel)
             )
         }) { padding ->
         if (photoCarList.isNotEmpty()) {
-            LazyRow(
-                modifier = Modifier.padding(top = padding.calculateTopPadding()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(photoCarList.size) { index ->
-                    Card(
-                        modifier = Modifier
-                            .width(screenWidthDp.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color.White)
-                    ) {
-                        Column() {
-                            Box(
-                                modifier = Modifier
-                                    .size(screenWidthDp.dp)
-                                    .clip(RoundedCornerShape(8.dp))
-                            ) {
-                                Image(
-                                    bitmap = photoCarList[index].bitmap.asImageBitmap(),
-                                    contentDescription = null,
-                                    contentScale = ContentScale.Crop,
+            Column {
+                LazyRow(
+                    modifier = Modifier.padding(top = padding.calculateTopPadding()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(photoCarList.size) { index ->
+                        Card(
+                            modifier = Modifier
+                                .width(screenWidthDp.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color.White)
+                        ) {
+                            Column() {
+                                Box(
                                     modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(10.dp)
+                                        .size(screenWidthDp.dp)
                                         .clip(RoundedCornerShape(8.dp))
-                                )
-
-                                Text(
-                                    text = "${index + 1} of ${photoCarList.size}",
-                                    color = Color.White,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 12.sp,
-                                    modifier = Modifier
-                                        .align(Alignment.TopStart)
-                                        .padding(start = 20.dp, top = 20.dp)
-                                        .background(
-                                            color = Color.Black.copy(alpha = 0.5f),
-                                            shape = RoundedCornerShape(6.dp)
-                                        )
-                                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                                )
-                            }
-
-                            if (photoCarList[index].score > 0) {
-                                Column(
-                                    horizontalAlignment = Alignment.End
                                 ) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween
-                                    ) {
+                                    Image(
+                                        bitmap = photoCarList[index].bitmap.asImageBitmap(),
+                                        contentDescription = null,
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(10.dp)
+                                            .clip(RoundedCornerShape(8.dp))
+                                    )
 
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            modifier = Modifier.padding(start = 20.dp)
-                                        ) {
-                                            Icon(
-                                                imageVector = if (photoCarList[index].score <= 0.5f)
-                                                    Icons.Filled.VerifiedUser
-                                                else
-                                                    Icons.Filled.Sick,
-                                                contentDescription = null,
-                                                tint = if (photoCarList[index].score <= 0.5f)
-                                                    Color(0xFF4CAF50)
-                                                else
-                                                    Color(0xFFF44336)
+                                    Text(
+                                        text = "${index + 1} of ${photoCarList.size}",
+                                        color = Color.White,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 12.sp,
+                                        modifier = Modifier
+                                            .align(Alignment.TopStart)
+                                            .padding(start = 20.dp, top = 20.dp)
+                                            .background(
+                                                color = Color.Black.copy(alpha = 0.5f),
+                                                shape = RoundedCornerShape(6.dp)
                                             )
+                                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                                    )
+                                }
 
-                                            Spacer(modifier = Modifier.width(8.dp)) // spacing between icon and text
+                                if (photoCarList[index].score > 0) {
+                                    Column(
+                                        horizontalAlignment = Alignment.End
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween
+                                        ) {
+
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                modifier = Modifier.padding(start = 20.dp)
+                                            ) {
+                                                Icon(
+                                                    imageVector = if (photoCarList[index].score <= 0.5f)
+                                                        Icons.Filled.VerifiedUser
+                                                    else
+                                                        Icons.Filled.Sick,
+                                                    contentDescription = null,
+                                                    tint = if (photoCarList[index].score <= 0.5f)
+                                                        Color(0xFF4CAF50)
+                                                    else
+                                                        Color(0xFFF44336)
+                                                )
+
+                                                Spacer(modifier = Modifier.width(8.dp)) // spacing between icon and text
+
+                                                Text(
+                                                    text = if (photoCarList[index].score <= 0.5f) "Healthy" else "Disease",
+                                                    color = Color.Black,
+                                                    fontSize = 12.sp,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            }
 
                                             Text(
-                                                text = if (photoCarList[index].score <= 0.5f) "Healthy" else "Disease",
+                                                text = "Score: %.4f".format(photoCarList[index].score),
                                                 color = Color.Black,
+                                                fontWeight = FontWeight.Bold,
                                                 fontSize = 12.sp,
-                                                fontWeight = FontWeight.Bold
+                                                modifier = Modifier.padding(horizontal = 20.dp)
                                             )
                                         }
-
                                         Text(
-                                            text = "Score: %.4f".format(photoCarList[index].score),
+                                            text = "Processed in ${photoCarList[index].processTimeStr}",
                                             color = Color.Black,
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 12.sp,
                                             modifier = Modifier.padding(horizontal = 20.dp)
                                         )
                                     }
-                                    Text(
-                                        text = "Processed in photo.processTime ms",
-                                        color = Color.Black,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 12.sp,
-                                        modifier = Modifier.padding(horizontal = 20.dp)
-                                    )
                                 }
                             }
                         }
                     }
                 }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 10.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (totalProcessTime > 0) {
+                        Text(text = "Total Process Time: ${totalProcessTimeStr}", fontSize = 20.sp)
+                    }
+                }
             }
         }
-
-
     }
 }
 
@@ -235,7 +247,9 @@ fun SlideBottomBarContent(
         }
 
         Button(
-            onClick = { ModelHelper(viewModel).inference(selectedModel, context, photoCarList) },
+            onClick = {
+                ModelHelper(viewModel).inference(selectedModel, context, photoCarList)
+            },
             shape = RoundedCornerShape(20),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
             modifier = Modifier.width(150.dp)

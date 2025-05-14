@@ -46,8 +46,8 @@ class MainViewModel : ViewModel() {
     private val _photoCarList = MutableStateFlow<List<PhotoCar>>(emptyList())
     val photoCarList: StateFlow<List<PhotoCar>> = _photoCarList.asStateFlow()
 
-    fun addPhotoCar(bitmap: Bitmap, score: Float = 0.0f) {
-        val updated = _photoCarList.value + PhotoCar(bitmap, score)
+    fun addPhotoCar(bitmap: Bitmap, score: Float = 0.0f, processTime: Long = 0L) {
+        val updated = _photoCarList.value + PhotoCar(bitmap, score, processTime)
         _photoCarList.value = updated
     }
 
@@ -55,12 +55,26 @@ class MainViewModel : ViewModel() {
         _photoCarList.value = emptyList()
     }
 
-    fun updatePhotoCarScore(index: Int, newScore: Float) {
+    fun updatePhotoCarScore(index: Int, newScore: Float, processTime: Long) {
         val currentList = _photoCarList.value.toMutableList()
         val photoCar = currentList.getOrNull(index) ?: return
-        currentList[index] = photoCar.copy(score = newScore)
+        currentList[index] = photoCar.copy(score = newScore, processTime = processTime)
         _photoCarList.value = currentList
     }
+
+    private val _totalProcessTime = MutableStateFlow(0L)
+    val totalProcessTime = _totalProcessTime.asStateFlow()
+
+    private val _totalProcessTimeStr = MutableStateFlow("")
+    val totalProcessTimeStr = _totalProcessTimeStr.asStateFlow()
+
+    fun setTotalProcessTime(t: Long) {
+        _totalProcessTime.value = t
+        val seconds = _totalProcessTime.value / 1000
+        val millis = _totalProcessTime.value % 1000
+        _totalProcessTimeStr.value  = "${seconds}s ${millis}ms"
+    }
+
 
 
     private val _models =
@@ -78,6 +92,13 @@ class MainViewModel : ViewModel() {
         _selectedModel.value = selected
 
         _selectedIndex.value = index
+    }
+
+    private val _loading = MutableStateFlow(value = false)
+    val loading = _loading.asStateFlow()
+
+    fun setLoading(b: Boolean) {
+        _loading.value = b
     }
 
     private val _showSheet = MutableStateFlow(value = false)
@@ -104,5 +125,13 @@ class MainViewModel : ViewModel() {
 
 data class PhotoCar(
     val bitmap: Bitmap,
-    val score: Float = 0.0f
-)
+    val score: Float = 0.0f,
+    val processTime: Long = 0L,
+) {
+    val processTimeStr: String
+        get() {
+            val seconds = processTime / 1000
+            val millis = processTime % 1000
+            return "${seconds}s ${millis}ms"
+        }
+}

@@ -83,6 +83,7 @@ fun CameraPreview(
                         takePhoto(
                             controller = controller,
                             current = current,
+                            viewModel = viewModel,
                             onPhotoTaken = viewModel::onTakePhoto
                         )
                     },
@@ -105,6 +106,7 @@ fun CameraPreview(
 private fun takePhoto(
     controller: LifecycleCameraController,
     current: Context,
+    viewModel: MainViewModel,
     onPhotoTaken: (Bitmap, Context) -> Unit
 ) {
     val cameraExecutor = Executors.newSingleThreadExecutor()
@@ -113,6 +115,7 @@ private fun takePhoto(
         object : OnImageCapturedCallback() {
             override fun onCaptureStarted() {
                 super.onCaptureStarted()
+                viewModel.setLoading(true)
             }
 
             override fun onCaptureSuccess(image: ImageProxy) {
@@ -134,6 +137,7 @@ private fun takePhoto(
 
                 val shape = listOf(rotatedBitmap.width, rotatedBitmap.height).joinToString(", ")
                 onPhotoTaken(rotatedBitmap, current)
+                viewModel.setLoading(false)
             }
 
             override fun onError(exception: ImageCaptureException) {
