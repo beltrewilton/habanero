@@ -24,14 +24,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.habanero.layout.Layout
 import com.habanero.lifecycle.MainViewModel
+import com.habanero.ui.theme.homeSubtitle
+import com.habanero.ui.theme.homeTitle
 
 @Composable
 fun HomeScreen(viewModel: MainViewModel, navigateToCamera: () -> Unit) {
     val context = LocalContext.current
 
     Layout(
-        title = "Plant disease dectection using CNN",
-        subtitle = "Capstone proyect SMU university\ncestevez@smu.edu",
+        title = homeTitle,
+        subtitle = homeSubtitle,
         viewModel = viewModel,
         bottomBar = true,
         bottomBarContent = {

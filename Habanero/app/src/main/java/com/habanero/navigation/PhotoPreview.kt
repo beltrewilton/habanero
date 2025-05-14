@@ -38,6 +38,8 @@ import com.habanero.core.ModelHelper
 import com.habanero.layout.Layout
 import com.habanero.lifecycle.MainViewModel
 import com.habanero.lifecycle.PhotoCar
+import com.habanero.ui.theme.darkgreen
+import com.habanero.ui.theme.darkred
 
 @Composable
 fun PhotoPreview(
@@ -70,7 +72,7 @@ fun PhotoPreview(
                         viewModel.setCropit(true)
                     },
                     colors = SliderDefaults.colors(
-                        activeTrackColor = Color(0xFF5C8518),
+                        activeTrackColor = darkgreen,
                         inactiveTrackColor = Color.LightGray
                     )
                 )
@@ -123,7 +125,7 @@ fun BottomBarContent(
                 viewModel.clearBitmaps()
             },
             shape = RoundedCornerShape(20),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00963D)),
+            colors = ButtonDefaults.buttonColors(containerColor = darkgreen),
             modifier = Modifier.width(150.dp)
         ) {
             Icon(
@@ -143,7 +145,7 @@ fun BottomBarContent(
                     viewModel.setCropit(false)
                 },
                 shape = RoundedCornerShape(20),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF730606)),
+                colors = ButtonDefaults.buttonColors(containerColor = darkred),
                 modifier = Modifier.width(150.dp)
             ) {
                 Icon(

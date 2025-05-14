@@ -30,6 +30,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.habanero.layout.Layout
 import com.habanero.lifecycle.MainViewModel
+import com.habanero.ui.theme.yellow
 import java.util.concurrent.Executors
 
 
@@ -55,7 +56,7 @@ fun CameraPreview(
 
             }
         },
-        backgroundColor = Color(0xFFE8E854)
+        backgroundColor = yellow
     ) { padding ->
 
         Box(

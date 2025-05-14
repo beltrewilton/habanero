@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.habanero.lifecycle.MainViewModel
+import com.habanero.ui.theme.darkgreen
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -56,7 +57,7 @@ fun Layout(
     bottomBar: Boolean = false,
     bottomSheetContent: (@Composable ColumnScope.() -> Unit)? = null,
     bottomBarContent: (@Composable () -> Unit)? = null,
-    backgroundColor: Color? = Color(0xFF5C8518),
+    backgroundColor: Color? = darkgreen,
     backgroundImage: Painter? = null,
     content: @Composable (PaddingValues) -> Unit
 ) {

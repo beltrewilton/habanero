@@ -47,6 +47,8 @@ import com.habanero.core.ModelHelper
 import com.habanero.layout.Layout
 import com.habanero.lifecycle.MainViewModel
 import com.habanero.lifecycle.PhotoCar
+import com.habanero.ui.theme.green
+import com.habanero.ui.theme.yellow
 
 @Composable
 fun PhotoSlideScreen(navController: NavHostController, viewModel: MainViewModel) {
@@ -63,7 +65,7 @@ fun PhotoSlideScreen(navController: NavHostController, viewModel: MainViewModel)
         title = "Performing inference with model\n$selectedModel",
         titleColor = Color.Black,
         viewModel = viewModel,
-        backgroundColor = Color(0xFFE5DE26),
+        backgroundColor = yellow,
         bottomBar = true,
         bottomSheetContent = {
             Text("Configure Model", modifier = Modifier.padding(16.dp))
@@ -164,9 +166,9 @@ fun PhotoSlideScreen(navController: NavHostController, viewModel: MainViewModel)
                                                         Icons.Filled.Sick,
                                                     contentDescription = null,
                                                     tint = if (photoCarList[index].score <= 0.5f)
-                                                        Color(0xFF4CAF50)
+                                                        green
                                                     else
-                                                        Color(0xFFF44336)
+                                                        green
                                                 )
 
                                                 Spacer(modifier = Modifier.width(8.dp)) // spacing between icon and text
@@ -234,7 +236,7 @@ fun SlideBottomBarContent(
                 navController.navigate(Camera)
             },
             shape = RoundedCornerShape(20),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00963D)),
+            colors = ButtonDefaults.buttonColors(containerColor = green),
             modifier = Modifier.width(150.dp)
         ) {
             Icon(

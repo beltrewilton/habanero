@@ -32,3 +32,7 @@ val Typography = Typography(
     )
     */
 )
+
+const val homeTitle = "Plant disease detection using CNN"
+const val homeSubtitle = "Capstone project SMU University\ncestevez@smu.edu"
+
