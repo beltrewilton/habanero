@@ -15,8 +15,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Crop
+import androidx.compose.material.icons.filled.CrueltyFree
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -29,12 +29,11 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -186,12 +185,12 @@ fun BottomBarContent(
                 }
             }
         } else {
-            val openAlertDialog = remember { mutableStateOf(true) }
-            if (openAlertDialog.value) {
-                HDialog(
-                    onDismissRequest = { openAlertDialog.value = false },
-                    onConfirmation = { openAlertDialog.value = false })
-            }
+            viewModel.showDialog(
+                true,
+                t = "No leaft found!",
+                s = "Please try again or adjust the threshold.",
+                icon = Icons.Default.CrueltyFree
+            )
         }
     }
 }
@@ -199,17 +198,20 @@ fun BottomBarContent(
 @Composable
 fun HDialog(
     onDismissRequest: () -> Unit,
-    onConfirmation: () -> Unit
+    onConfirmation: () -> Unit,
+    title: String,
+    subtitle: String,
+    icon: ImageVector
 ) {
     AlertDialog(
         icon = {
-            Icon(Icons.Default.Warning, contentDescription = null)
+            Icon(icon, contentDescription = null)
         },
         title = {
-            Text(text = "No leaft found!")
+            Text(text = title)
         },
         text = {
-            Text(text = "Please try again or adjust the threshold.")
+            Text(text = subtitle)
         },
         onDismissRequest = {
             onDismissRequest()

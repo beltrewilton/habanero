@@ -30,6 +30,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.habanero.lifecycle.MainViewModel
+import com.habanero.navigation.HDialog
 import com.habanero.ui.theme.darkgreen
 import kotlinx.coroutines.launch
 
@@ -65,6 +68,11 @@ fun Layout(
     val topBarHeight = screenHeightDp * 0.2
 
     val loading by viewModel.loading.collectAsState()
+    val showDialog by viewModel.showDialog.collectAsState()
+
+    var dialogTitle = viewModel.dialogTitle.collectAsState().value
+    var dialogSubTitle = viewModel.dialogSubTitle.collectAsState().value
+    var dialogIcon = viewModel.dialogIcon.collectAsState().value
 
     if (loading) {
         Box(
@@ -85,6 +93,25 @@ fun Layout(
             CircularProgressIndicator(
                 color = Color.White,
                 modifier = Modifier.size(64.dp)
+            )
+        }
+    }
+
+    if (showDialog) {
+        val openAlertDialog = remember { mutableStateOf(true) }
+        if (openAlertDialog.value) {
+            HDialog(
+                onDismissRequest = {
+                    openAlertDialog.value = false
+                    viewModel.showDialog(false)
+                },
+                onConfirmation = {
+                    openAlertDialog.value = false
+                    viewModel.showDialog(false)
+                },
+                title = dialogTitle,
+                subtitle = dialogSubTitle,
+                icon = dialogIcon
             )
         }
     }

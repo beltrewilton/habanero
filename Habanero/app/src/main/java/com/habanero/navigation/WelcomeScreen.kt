@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,20 +23,27 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.habanero.core.ensureModelFileExists
 import com.habanero.layout.Layout
 import com.habanero.lifecycle.MainViewModel
 import kotlinx.coroutines.delay
 
 @Composable
-fun WelcomeScreen(navController: NavHostController) {
+fun WelcomeScreen(navController: NavHostController, viewModel: MainViewModel) {
+    val context = LocalContext.current
+
+    var models = viewModel.models.collectAsState().value
+    models += "yolo11n_model_1_float16.tflite"
+
+    for (model in models) {
+        ensureModelFileExists(context = context, filename = "models/$model")
+    }
 
     LaunchedEffect(key1 = true) {
         delay(1000)
         navController.popBackStack()
         navController.navigate(Home)
     }
-
-    val context = LocalContext.current
 
     Layout(
         title = null,
@@ -50,7 +58,7 @@ fun WelcomeScreen(navController: NavHostController) {
             ) {
 
             }
-        }
+        },
     ) { padding ->
         val leaf = remember() {
             BitmapFactory.decodeStream(context.assets.open("leaf.png"))

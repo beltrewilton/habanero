@@ -15,7 +15,6 @@ import kotlinx.coroutines.withContext
 import org.tensorflow.lite.Interpreter
 import java.io.File
 import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.MappedByteBuffer
@@ -53,11 +52,6 @@ class ModelHelper(private val viewModel: MainViewModel) {
 
                     withContext(Dispatchers.Main) {
                         viewModel.addPhotoCar(cropped)
-                    }
-
-                    val file = File(context.filesDir, "$i-cropped.png")
-                    FileOutputStream(file).use {
-                        cropped.compress(Bitmap.CompressFormat.PNG, 100, it)
                     }
 
                     boxes.add(Rect(x1, y1, x2, y2))
@@ -114,13 +108,20 @@ class ModelHelper(private val viewModel: MainViewModel) {
         return interpreter
     }
 
+//    private fun loadModelFile(context: Context, filename: String): MappedByteBuffer {
+//        val fileDescriptor = context.assets.openFd(filename)
+//        val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
+//        val fileChannel = inputStream.channel
+//        val startOffset = fileDescriptor.startOffset
+//        val declaredLength = fileDescriptor.declaredLength
+//        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
+//    }
+
     private fun loadModelFile(context: Context, filename: String): MappedByteBuffer {
-        val fileDescriptor = context.assets.openFd(filename)
-        val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
+        val modelFile = File(context.filesDir, filename)
+        val inputStream = FileInputStream(modelFile)
         val fileChannel = inputStream.channel
-        val startOffset = fileDescriptor.startOffset
-        val declaredLength = fileDescriptor.declaredLength
-        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
+        return fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, fileChannel.size())
     }
 
 

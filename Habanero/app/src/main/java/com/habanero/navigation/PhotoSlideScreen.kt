@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Sick
+import androidx.compose.material.icons.filled.Update
 import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -31,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,12 +47,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.habanero.core.ModelHelper
+import com.habanero.core.update
 import com.habanero.layout.Layout
 import com.habanero.lifecycle.MainViewModel
 import com.habanero.lifecycle.PhotoCar
 import com.habanero.ui.theme.darkred
 import com.habanero.ui.theme.green
 import com.habanero.ui.theme.yellow
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun PhotoSlideScreen(navController: NavHostController, viewModel: MainViewModel) {
@@ -61,6 +67,8 @@ fun PhotoSlideScreen(navController: NavHostController, viewModel: MainViewModel)
     var totalProcessTime = viewModel.totalProcessTime.collectAsState().value
     val screenWidthDp = LocalConfiguration.current.screenWidthDp
     val screenHeightDp = LocalConfiguration.current.screenHeightDp
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     Layout(
         title = "Performing inference with model\n$selectedModel",
@@ -90,6 +98,35 @@ fun PhotoSlideScreen(navController: NavHostController, viewModel: MainViewModel)
                             label = { Text(label) }
                         )
                     }
+                }
+
+                Spacer(modifier = Modifier.height(60.dp))
+                Button(
+                    onClick = {
+                        viewModel.setShowSheet(false)
+                        coroutineScope.launch {
+                            coroutineScope {
+                                models.map { model ->
+                                    update(
+                                        viewModel = viewModel,
+                                        context = context,
+                                        localModelName = "models/$model"
+                                    )
+                                }
+                            }
+                        }
+                    },
+                    shape = RoundedCornerShape(20),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                    modifier = Modifier.width(300.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Update,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Model update", color = Color.White)
                 }
             }
         },

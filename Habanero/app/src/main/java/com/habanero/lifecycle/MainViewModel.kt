@@ -3,6 +3,9 @@ package com.habanero.lifecycle
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.core.graphics.createBitmap
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -76,7 +79,6 @@ class MainViewModel : ViewModel() {
     }
 
 
-
     private val _models =
         MutableStateFlow<List<String>>(listOf("vgg16_model_2.tflite", "mnet_model_2s.tflite"))
     val models: StateFlow<List<String>> = _models.asStateFlow()
@@ -99,6 +101,25 @@ class MainViewModel : ViewModel() {
 
     fun setLoading(b: Boolean) {
         _loading.value = b
+    }
+
+    private val _showDialog = MutableStateFlow(value = false)
+    val showDialog = _showDialog.asStateFlow()
+
+    private val _dialogTitle = MutableStateFlow("")
+    val dialogTitle = _dialogTitle.asStateFlow()
+
+    private val _dialogSubTitle = MutableStateFlow("")
+    val dialogSubTitle = _dialogSubTitle.asStateFlow()
+
+    private val _dialogIcon = MutableStateFlow(Icons.Default.Warning)
+    val dialogIcon = _dialogIcon.asStateFlow()
+
+    fun showDialog(b: Boolean, t: String = "", s: String = "", icon: ImageVector = Icons.Default.Warning) {
+        _showDialog.value = b
+        _dialogTitle.value = t
+        _dialogSubTitle.value = s
+        _dialogIcon.value = icon
     }
 
     private val _showSheet = MutableStateFlow(value = false)

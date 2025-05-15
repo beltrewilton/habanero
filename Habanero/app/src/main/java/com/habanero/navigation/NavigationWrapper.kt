@@ -14,7 +14,7 @@ fun NavigationWrapper() {
 
     NavHost(navController = navController, startDestination = Welcome) {
         composable<Welcome> {
-            WelcomeScreen(navController)
+            WelcomeScreen(navController, viewModel)
         }
 
         composable<Home> {
